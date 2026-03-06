@@ -3,10 +3,17 @@ let intervalo = null
 
 async function buscarActa(){
 
+try{
+
 const valor = document.getElementById("valor").value
 const tipo = document.getElementById("tipo").value
 const estado = document.getElementById("estado").value
 const buscarPor = document.getElementById("buscarPor").value
+
+if(!valor){
+document.getElementById("resultado").innerHTML = "Ingrese CURP o cadena"
+return
+}
 
 let body = {
 type: tipo,
@@ -33,18 +40,31 @@ headers:{
 body:JSON.stringify(body)
 })
 
+if(!response.ok){
+throw new Error("Error en la API")
+}
+
 const data = await response.json()
 
 jobID = data.job_id
 
 document.getElementById("resultado").innerHTML =
-"Documento en proceso... esperando respuesta del Registro Civil"
+"Documento en proceso... revisando cada 5 segundos"
 
 intervalo = setInterval(checarStatus,5000)
+
+}catch(error){
+
+document.getElementById("resultado").innerHTML =
+"Error: " + error.message
+
+}
 
 }
 
 async function checarStatus(){
+
+try{
 
 const response = await fetch(
 `https://equations-rocket-annie-daughter.trycloudflare.com/api/actas/job/status/${jobID}`
@@ -57,14 +77,14 @@ if(data.status === "COMPLETED"){
 clearInterval(intervalo)
 
 document.getElementById("resultado").innerHTML =
-"Acta encontrada. Descargando..."
+"Acta lista. Descargando..."
 
-window.location.href = data.download
+window.open(data.download,"_blank")
 
 }else if(data.status === "PENDING"){
 
 document.getElementById("resultado").innerHTML =
-"El documento sigue en proceso... revisando automáticamente"
+"Documento en proceso... esperando respuesta"
 
 }else{
 
@@ -75,5 +95,11 @@ document.getElementById("resultado").innerHTML =
 
 }
 
+}catch(error){
+
+document.getElementById("resultado").innerHTML =
+"Error consultando status"
+
 }
 
+}
