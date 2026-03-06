@@ -2,22 +2,32 @@ let jobID = null
 
 async function buscarActa(){
 
-const curp = document.getElementById("curp").value
+const valor = document.getElementById("valor").value
 const tipo = document.getElementById("tipo").value
 const estado = document.getElementById("estado").value
+const buscarPor = document.getElementById("buscarPor").value
+
+let body = {
+type: tipo,
+search: buscarPor,
+state: estado,
+id_req:"1"
+}
+
+if(buscarPor === "curp"){
+body.Curp = valor
+}
+
+if(buscarPor === "cadena"){
+body.cadena = valor
+}
 
 const response = await fetch("https://equations-rocket-annie-daughter.trycloudflare.com/api/actas/job/new",{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
 },
-body:JSON.stringify({
-type:tipo,
-search:"curp",
-Curp:curp,
-state:estado,
-id_req:"1"
-})
+body:JSON.stringify(body)
 })
 
 const data = await response.json()
