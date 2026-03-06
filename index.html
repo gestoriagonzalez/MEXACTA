@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Descarga de Actas</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>Descargar Acta</h1>
+
+<div class="card">
+
+<label>CURP</label>
+<input type="text" id="curp">
+
+<label>Tipo de Acta</label>
+<select id="tipo">
+<option value="nacimiento">Nacimiento</option>
+<option value="matrimonio">Matrimonio</option>
+<option value="defuncion">Defunción</option>
+</select>
+
+<label>Estado</label>
+<input type="text" id="estado" placeholder="Ej: PUEBLA">
+
+<button onclick="buscarActa()">Buscar Acta</button>
+
+<div id="resultado"></div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
