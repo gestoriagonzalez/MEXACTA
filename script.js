@@ -1,4 +1,5 @@
 let jobID = null
+let intervalo = null
 
 async function buscarActa(){
 
@@ -22,6 +23,8 @@ if(buscarPor === "cadena"){
 body.cadena = valor
 }
 
+document.getElementById("resultado").innerHTML = "Enviando solicitud..."
+
 const response = await fetch("https://equations-rocket-annie-daughter.trycloudflare.com/api/actas/job/new",{
 method:"POST",
 headers:{
@@ -35,7 +38,10 @@ const data = await response.json()
 jobID = data.job_id
 
 document.getElementById("resultado").innerHTML =
-"Documento en proceso...<br><button onclick='checarStatus()'>Consultar Status</button>"
+"Documento en proceso... esperando respuesta del Registro Civil"
+
+intervalo = setInterval(checarStatus,5000)
+
 }
 
 async function checarStatus(){
@@ -48,14 +54,26 @@ const data = await response.json()
 
 if(data.status === "COMPLETED"){
 
+clearInterval(intervalo)
+
 document.getElementById("resultado").innerHTML =
-`<a href="${data.download}" target="_blank">Descargar Acta</a>`
+"Acta encontrada. Descargando..."
+
+window.location.href = data.download
+
+}else if(data.status === "PENDING"){
+
+document.getElementById("resultado").innerHTML =
+"El documento sigue en proceso... revisando automáticamente"
 
 }else{
 
+clearInterval(intervalo)
+
 document.getElementById("resultado").innerHTML =
-"El documento sigue en proceso..."
+"No fue posible obtener el documento"
 
 }
 
 }
+
