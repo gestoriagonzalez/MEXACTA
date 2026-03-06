@@ -1,31 +1,42 @@
 let jobID = null
 let intervalo = null
 
+document.getElementById("buscar").addEventListener("click", buscarActa)
+
 async function buscarActa(){
+
+const resultado = document.getElementById("resultado")
 
 const valor = document.getElementById("valor").value
 const tipo = document.getElementById("tipo").value
 const estado = document.getElementById("estado").value
 const buscarPor = document.getElementById("buscarPor").value
 
-let body = {
-type: tipo,
-search: buscarPor,
-state: estado,
+if(!valor){
+resultado.innerHTML="Ingrese CURP o cadena"
+return
+}
+
+let body={
+type:tipo,
+search:buscarPor,
+state:estado,
 id_req:"1"
 }
 
-if(buscarPor === "curp"){
-body.Curp = valor
+if(buscarPor==="curp"){
+body.Curp=valor
 }
 
-if(buscarPor === "cadena"){
-body.cadena = valor
+if(buscarPor==="cadena"){
+body.cadena=valor
 }
 
-document.getElementById("resultado").innerHTML = "Enviando solicitud..."
+resultado.innerHTML="Enviando solicitud..."
 
-const response = await fetch("/api/new",{
+try{
+
+const response=await fetch("/api/new",{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
@@ -33,38 +44,49 @@ headers:{
 body:JSON.stringify(body)
 })
 
-const data = await response.json()
+const data=await response.json()
 
-jobID = data.job_id
+jobID=data.job_id
 
-document.getElementById("resultado").innerHTML =
-"Documento en proceso... revisando cada 5 segundos"
+resultado.innerHTML="Documento en proceso..."
 
-intervalo = setInterval(checarStatus,5000)
+intervalo=setInterval(checarStatus,5000)
+
+}catch(error){
+
+resultado.innerHTML="Error conectando con servidor"
+
+}
 
 }
 
 async function checarStatus(){
 
-const response = await fetch(`/api/status?id=${jobID}`)
+const resultado=document.getElementById("resultado")
 
-const data = await response.json()
+try{
 
-if(data.status === "COMPLETED"){
+const response=await fetch(`/api/status?id=${jobID}`)
+const data=await response.json()
+
+if(data.status==="COMPLETED"){
 
 clearInterval(intervalo)
 
-document.getElementById("resultado").innerHTML =
-"Acta lista. Descargando..."
+resultado.innerHTML="Acta lista, descargando..."
 
 window.open(data.download,"_blank")
 
 }else{
 
-document.getElementById("resultado").innerHTML =
-"Documento en proceso..."
+resultado.innerHTML="Buscando documento..."
+
+}
+
+}catch(error){
+
+resultado.innerHTML="Error consultando estado"
 
 }
 
 }
-
